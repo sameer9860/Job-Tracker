@@ -1,4 +1,4 @@
-# 🚀 Lead Management System - Installation Guide
+# 🚀 Job Tracker System - Installation Guide
 
 # 1. Clone the Repository
 git clone https://github.com/sameer9860/Job-Tracker.git
