@@ -139,3 +139,20 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+
+DEFAULT_FROM_EMAIL = "jobtracker@localhost"
+
+#for production use Gmail SMTP
+# if DEBUG:
+#     EMAIL_HOST = "localhost"
+#     EMAIL_PORT = 1025
+# else:
+#     EMAIL_HOST = "smtp.gmail.com"
