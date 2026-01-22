@@ -20,7 +20,9 @@ function Login() {
 
       window.location.href = "/dashboard";
     } catch (err) {
+        console.error(err.response?.data);
       setError("Invalid credentials");
+     
     }
   };
 
@@ -36,7 +38,8 @@ function Login() {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="password"
@@ -44,7 +47,8 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <br /><br />
+        <br />
+        <br />
 
         <button type="submit">Login</button>
       </form>
