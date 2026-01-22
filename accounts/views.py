@@ -1,58 +1,62 @@
-# accounts/views.py
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from .models import OTP
-from .serializers import PasswordResetEmailSerializer, OTPVerifySerializer, PasswordResetSerializer
+from .serializers import PasswordResetRequestSerializer, OTPVerifySerializer, SetNewPasswordSerializer
 import random
-from django.core.mail import send_mail
-from django.conf import settings
-
-def send_otp_email(email, code):
-    send_mail(
-        subject="Your OTP Code",
-        message=f"Your OTP is: {code}",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
+from .tasks import send_otp_email
+from django.utils import timezone
 
 class PasswordResetRequestView(APIView):
     def post(self, request):
-        serializer = PasswordResetEmailSerializer(data=request.data)
+        serializer = PasswordResetRequestSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
+        email = serializer.validated_data["email"]
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({"detail": "User not found"}, status=404)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"detail": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        otp_code = str(random.randint(100000, 999999))
+        OTP.objects.create(user=user, code=otp_code)
 
-        code = str(random.randint(100000, 999999))
-        OTP.objects.create(user=user, code=code)
-        send_otp_email(email, code)
-        return Response({"detail": "OTP sent to email."})
+        send_otp_email(user.id, otp_code)  # background task
+        return Response({"detail": "OTP sent to your email"})
 
-class PasswordResetConfirmView(APIView):
+class OTPVerifyView(APIView):
     def post(self, request):
-        serializer = PasswordResetSerializer(data=request.data)
+        serializer = OTPVerifySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        otp_code = serializer.validated_data['otp']
-        password = serializer.validated_data['password1']
+        email = serializer.validated_data["email"]
+        otp_code = serializer.validated_data["otp_code"]
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({"detail": "User not found"}, status=404)
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"detail": "Invalid email."}, status=status.HTTP_400_BAD_REQUEST)
+        otp = OTP.objects.filter(user=user, code=otp_code, is_used=False, expires_at__gte=timezone.now()).first()
+        if not otp:
+            return Response({"detail": "Invalid or expired OTP"}, status=400)
 
-        otp_qs = OTP.objects.filter(user=user, code=otp_code).order_by('-created_at')
-        if not otp_qs.exists() or not otp_qs.first().is_valid():
-            return Response({"detail": "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
+        otp.is_used = True
+        otp.save()
+        return Response({"detail": "OTP verified"})
+
+class SetNewPasswordView(APIView):
+    def post(self, request):
+        serializer = SetNewPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+        otp_code = serializer.validated_data["otp_code"]
+        password = serializer.validated_data["new_password1"]
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            return Response({"detail": "User not found"}, status=404)
+
+        otp = OTP.objects.filter(user=user, code=otp_code, is_used=True).first()
+        if not otp:
+            return Response({"detail": "OTP not verified or invalid"}, status=400)
 
         user.set_password(password)
         user.save()
-        otp_qs.delete()  # optional: remove OTP after use
-
-        return Response({"detail": "Password reset successful."})
+        return Response({"detail": "Password changed successfully"})

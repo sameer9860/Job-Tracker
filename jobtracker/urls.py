@@ -30,6 +30,8 @@ urlpatterns = [
 
     # APIs
     path('api/', include('jobs.urls')),
+    path("api/accounts/", include("accounts.urls")),
+
 ]
 
 # Wire up our API using automatic URL routing.

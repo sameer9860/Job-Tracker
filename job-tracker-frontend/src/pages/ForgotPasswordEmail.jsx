@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 
-export default function ForgotPasswordEmail({ onOTPSent }) {
+export default function ForgotPasswordEmail() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -12,7 +14,7 @@ export default function ForgotPasswordEmail({ onOTPSent }) {
     try {
       const res = await API.post("accounts/password-reset-request/", { email });
       setSuccess(res.data.detail);
-      onOTPSent(email);
+      setTimeout(() => navigate("/reset-password", { state: { email } }), 1000);
     } catch (err) {
       setError(err.response?.data.detail || "Error sending OTP");
     }

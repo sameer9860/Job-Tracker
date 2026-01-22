@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'jobs.apps.JobsConfig',
     'accounts',
     'corsheaders',
-    
+    'background_task',
     
 ]
 

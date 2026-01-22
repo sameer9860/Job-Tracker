@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
-export default function ForgotPasswordOTP({ email, onSuccess }) {
+export default function ForgotPasswordOTP() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email || "";
   const [otp, setOTP] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
@@ -16,7 +20,7 @@ export default function ForgotPasswordOTP({ email, onSuccess }) {
         email, otp, password1, password2
       });
       setSuccess(res.data.detail);
-      setTimeout(() => onSuccess(), 1500);
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       setError(err.response?.data.detail || "Error resetting password");
     }
