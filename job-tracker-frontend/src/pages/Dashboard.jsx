@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import API from "../services/api";
+import API, { getUser } from "../services/api";
 import axios from "axios";
 
 import AddJobModal from "../components/AddJobModal";
@@ -8,6 +8,7 @@ import FunnelStats from "../components/charts/FunnelStats";
 
 function Dashboard() {
   const [data, setData] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,17 +32,26 @@ function Dashboard() {
     return res.data.access;
   };
 
-  /* 📊 Load dashboard */
+  /* 📊 Load dashboard and user info */
   const fetchDashboard = async () => {
     try {
       const res = await API.get("dashboard/");
       setData({ ...res.data, jobs: res.data.jobs || [] });
+
+      // fetch logged-in user
+      const userData = await getUser();
+      setUser(userData);
+
     } catch (err) {
       if (err.response?.status === 401) {
         try {
           await refreshToken();
           const retry = await API.get("dashboard/");
           setData({ ...retry.data, jobs: retry.data.jobs || [] });
+
+          const userRetry = await getUser();
+          setUser(userRetry);
+
         } catch {
           logout();
         }
@@ -77,36 +87,74 @@ function Dashboard() {
 
   return (
     <div style={{ ...styles.page, background: isDark ? "#1f1f2e" : "#eef2ff", color: isDark ? "#f3f4f6" : "#1f2937" }}>
-      {/* # Job Application Dashboard */}
-  <header style={{ ...styles.header, background: isDark ? "#2d2d3d" : "#fff" }}>
-  <div>
-    <h2 style={{ margin: 0 }}>Job Application Dashboard</h2>
-    <p style={{ marginTop: "4px", color: isDark ? "#cbd5e1" : "#6b7280" }}>
-      Track your progress and job search performance
-    </p>
-  </div>
-  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-    <button onClick={toggleTheme} style={styles.themeBtn}>
-      {theme === "light" ? "🌙 Dark" : "☀️ Light"}
-    </button>
-    <button style={styles.addBtn} onClick={() => setModalOpen(true)}>
-      + Add Job
-    </button>
-    <button
-      style={{
-        ...styles.logoutBtn,
-        background: isDark ? "#3b3b4f" : "#fff",
-        color: isDark ? "#f3f4f6" : "#4f46e5",
-      }}
-      onClick={logout}
-    >
-      Logout
-    </button>
-  </div>
-</header>
+      {/* # Job Application Dashboard Header */}
+      <header style={{ ...styles.header, background: isDark ? "#2d2d3d" : "#fff" }}>
+        <div>
+          <h2 style={{ margin: 0 }}>Job Application Dashboard</h2>
+          <p style={{ marginTop: "4px", color: isDark ? "#cbd5e1" : "#6b7280" }}>
+            Track your progress and job search performance
+          </p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {/* Theme Toggler */}
+          <button onClick={toggleTheme} style={styles.themeBtn}>
+            {theme === "light" ? "🌙 Dark" : "☀️ Light"}
+          </button>
 
+          {/* Profile Card */}
+          {user && (
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 12px",
+              borderRadius: "12px",
+              background: isDark ? "#3b3b4f" : "#f3f4f6"
+            }}>
+              <div style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                background: "#4f46e5",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                color: "#fff",
+                fontWeight: "bold",
+              }}>
+                {user.username[0].toUpperCase()}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span style={{ fontWeight: "bold", color: isDark ? "#f3f4f6" : "#1f2937" }}>
+                  {user.username}
+                </span>
+                <span style={{ fontSize: "12px", color: isDark ? "#cbd5e1" : "#6b7280" }}>
+                  {user.email}
+                </span>
+              </div>
+            </div>
+          )}
 
-      {/* 📊 STATS CARDS */}
+          {/* Add Job Button */}
+          <button style={styles.addBtn} onClick={() => setModalOpen(true)}>
+            + Add Job
+          </button>
+
+          {/* Logout */}
+          <button
+            style={{
+              ...styles.logoutBtn,
+              background: isDark ? "#3b3b4f" : "#fff",
+              color: isDark ? "#f3f4f6" : "#4f46e5",
+            }}
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      {/* 📊 Stats Cards */}
       <section style={styles.statsGrid}>
         <StatCard label="Total Applications" value={data.total_applications} color="#4f46e5" theme={theme} />
         <StatCard label="Applied" value={data.status_counts.applied} color="#2563eb" theme={theme} />
@@ -115,13 +163,13 @@ function Dashboard() {
         <StatCard label="Rejected" value={data.status_counts.rejected} color="#ef4444" theme={theme} />
       </section>
 
-      {/* 📈 KPI CARDS */}
+      {/* 📈 KPI Cards */}
       <section style={styles.kpiGrid}>
         <KpiCard title="Interview Success Rate" value={`${data.rates.interview_success_rate}%`} desc="Interviews per application" theme={theme} />
         <KpiCard title="Offer Conversion Rate" value={`${data.rates.offer_conversion_rate}%`} desc="Offers per interview" theme={theme} />
       </section>
 
-      {/* 📊 CHARTS */}
+      {/* 📊 Charts */}
       <section style={styles.chartGrid}>
         <StatusChart stats={data.status_counts} theme={theme} size={400} />
         <FunnelStats stats={data.status_counts} theme={theme} size={400} />
@@ -133,7 +181,7 @@ function Dashboard() {
   );
 }
 
-/* 🔹 Stat Card */
+/* Stat Card */
 function StatCard({ label, value, color, theme }) {
   const isDark = theme === "dark";
   return (
@@ -144,7 +192,7 @@ function StatCard({ label, value, color, theme }) {
   );
 }
 
-/* 🔹 KPI Card */
+/* KPI Card */
 function KpiCard({ title, value, desc, theme }) {
   const isDark = theme === "dark";
   return (
@@ -156,7 +204,7 @@ function KpiCard({ title, value, desc, theme }) {
   );
 }
 
-/* 🎨 Styles */
+/* Styles */
 const styles = {
   page: { minHeight: "100vh" },
   header: {
@@ -199,11 +247,7 @@ const styles = {
     gap: "20px",
     padding: "30px",
   },
-  statCard: {
-    padding: "20px",
-    borderRadius: "16px",
-    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
-  },
+  statCard: { padding: "20px", borderRadius: "16px", boxShadow: "0 10px 25px rgba(0,0,0,0.08)" },
   statLabel: { fontSize: "14px", color: "#6b7280" },
   statValue: { fontSize: "28px", marginTop: "8px", fontWeight: "bold" },
   kpiGrid: {
@@ -225,6 +269,5 @@ const styles = {
   center: { textAlign: "center", marginTop: "60px" },
   error: { color: "red", textAlign: "center", marginTop: "60px" },
 };
-
 
 export default Dashboard;

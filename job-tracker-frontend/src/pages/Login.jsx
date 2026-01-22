@@ -17,14 +17,11 @@ function Login() {
     try {
       const res = await API.post("token/", { username, password });
 
-      // Save JWT tokens
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
 
-      // Redirect to dashboard
       window.location.href = "/dashboard";
     } catch (err) {
-      // Always set string for React
       setError("Invalid username or password");
       setLoading(false);
     }
@@ -33,22 +30,20 @@ function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.title}>Welcome Back</h2>
-        <p style={styles.subtitle}>Login to your Job Tracker</p>
+        <h2 style={styles.title}>🔐 Welcome Back</h2>
+        <p style={styles.subtitle}>Login to continue your journey</p>
 
-        {/* Error message */}
-        {typeof error === "string" && <p style={styles.error}>{error}</p>}
+        {error && <p style={styles.error}>{error}</p>}
 
         <form onSubmit={handleSubmit}>
-          {/* Username */}
           <input
             style={styles.input}
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            required
           />
 
-          {/* Password */}
           <div style={styles.passwordWrapper}>
             <input
               style={styles.input}
@@ -56,21 +51,19 @@ function Login() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
-
-            <span
-              style={styles.eye}
-              onClick={() => setShowPassword(!showPassword)}
-            >
+            <span style={styles.eye} onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </span>
           </div>
 
-          {/* Login button */}
           <button style={styles.button} disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "⏳ Logging in..." : "Login"}
           </button>
         </form>
+
+       
       </div>
     </div>
   );
@@ -86,37 +79,43 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     background: "linear-gradient(135deg, #667eea, #764ba2)",
+    animation: "gradientShift 8s ease infinite",
   },
   card: {
-    background: "#fff",
+    background: "rgba(255, 255, 255, 0.15)",
+    backdropFilter: "blur(12px)",
     padding: "40px",
-    borderRadius: "12px",
+    borderRadius: "16px",
     width: "100%",
-    maxWidth: "380px",
-    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+    maxWidth: "400px",
+    boxShadow: "0 10px 40px rgba(0,0,0,0.2)",
+    color: "#fff",
+    textAlign: "center",
   },
   title: {
     marginBottom: "5px",
-    textAlign: "center",
+    fontSize: "24px",
+    fontWeight: "bold",
   },
   subtitle: {
     marginBottom: "25px",
-    textAlign: "center",
-    color: "#666",
     fontSize: "14px",
+    color: "#e5e5e5",
   },
   error: {
-    color: "red",
+    color: "#ff6b6b",
     marginBottom: "15px",
-    textAlign: "center",
+    fontWeight: "bold",
   },
   input: {
     width: "100%",
     padding: "12px",
     marginBottom: "15px",
     borderRadius: "8px",
-    border: "1px solid #ccc",
+    border: "1px solid #ddd",
     fontSize: "14px",
+    outline: "none",
+    transition: "border 0.3s",
   },
   passwordWrapper: {
     position: "relative",
@@ -127,17 +126,30 @@ const styles = {
     top: "50%",
     transform: "translateY(-50%)",
     cursor: "pointer",
-    color: "#666",
+    color: "#444",
   },
   button: {
     width: "100%",
     padding: "12px",
     borderRadius: "8px",
     border: "none",
-    background: "#667eea",
+    background: "#4f46e5",
     color: "#fff",
     fontSize: "16px",
+    fontWeight: "bold",
     cursor: "pointer",
     marginTop: "10px",
+    transition: "background 0.3s",
+  },
+  footer: {
+    marginTop: "20px",
+    fontSize: "13px",
+    color: "#ddd",
+  },
+  link: {
+    color: "#fff",
+    fontWeight: "bold",
+    textDecoration: "underline",
+    cursor: "pointer",
   },
 };

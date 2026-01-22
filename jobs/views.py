@@ -52,3 +52,12 @@ def update_job_status(request, pk):
     # Optional: return updated job
     serializer = JobApplicationSerializer(job)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    user = request.user
+    return Response({
+        "username": user.username,
+        "email": user.email,
+    })

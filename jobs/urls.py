@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import JobApplicationViewSet, ReminderViewSet
+from .views import JobApplicationViewSet, ReminderViewSet, current_user
 from .dashboard import dashboard_stats
 from jobs import views
 
@@ -10,6 +10,8 @@ router.register('reminders', ReminderViewSet, basename='reminders')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("user/", current_user, name="current-user"),
+
     path('dashboard/', dashboard_stats, name='dashboard-stats'),
     path("jobs/<int:pk>/status/", views.update_job_status, name="update_job_status"),
 

@@ -16,4 +16,10 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// api.js
+export const getUser = async () => {
+  const res = await API.get("user/"); // make sure your Django backend has this endpoint
+  return res.data;
+};
+
 export default API;
