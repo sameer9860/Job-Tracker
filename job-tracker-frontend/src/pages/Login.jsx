@@ -1,28 +1,22 @@
 import { useState } from "react";
 import API from "../services/api";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await API.post("token/", {
-        username,
-        password,
-      });
-
+      const res = await API.post("token/", { username, password });
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
-
       window.location.href = "/dashboard";
-    } catch (err) {
-        console.error(err.response?.data);
-      setError("Invalid credentials");
-     
+    } catch {
+      setError("Invalid username or password");
     }
   };
 
@@ -37,20 +31,42 @@ function Login() {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
         />
-        <br />
-        <br />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <br />
+        <div style={{ position: "relative" }}>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ width: "100%", padding: "10px" }}
+          />
 
-        <button type="submit">Login</button>
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+            }}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        <button
+          type="submit"
+          style={{
+            marginTop: "15px",
+            width: "100%",
+            padding: "10px",
+          }}
+        >
+          Login
+        </button>
       </form>
     </div>
   );
