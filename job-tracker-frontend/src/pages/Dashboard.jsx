@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import axios from "axios";
 import KanbanBoard from "../components/KanbanBoard";
-
-
+import AddJobModal from "../components/AddJobModal";
 
 function Dashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // 🔐 Logout
   const logout = () => {
@@ -26,7 +26,6 @@ function Dashboard() {
       "http://127.0.0.1:8000/api/token/refresh/",
       { refresh }
     );
-
     localStorage.setItem("access_token", res.data.access);
     return res.data.access;
   };
@@ -35,13 +34,14 @@ function Dashboard() {
   const fetchDashboard = async () => {
     try {
       const res = await API.get("dashboard/");
-      setData(res.data);
+      // Ensure jobs array exists
+      setData({ ...res.data, jobs: res.data.jobs || [] });
     } catch (err) {
       if (err.response?.status === 401) {
         try {
           await refreshToken();
           const retry = await API.get("dashboard/");
-          setData(retry.data);
+          setData({ ...retry.data, jobs: retry.data.jobs || [] });
         } catch {
           logout();
         }
@@ -57,6 +57,19 @@ function Dashboard() {
     fetchDashboard();
   }, []);
 
+  // ✅ Handle adding new job
+  const handleJobAdded = (newJob) => {
+    setData((prev) => ({
+      ...prev,
+      jobs: [newJob, ...prev.jobs],
+      total_applications: prev.total_applications + 1,
+      status_counts: {
+        ...prev.status_counts,
+        [newJob.status]: prev.status_counts[newJob.status] + 1,
+      },
+    }));
+  };
+
   if (loading) return <p style={styles.center}>Loading dashboard...</p>;
   if (error) return <p style={styles.error}>{error}</p>;
 
@@ -65,9 +78,14 @@ function Dashboard() {
       {/* 🔝 HEADER */}
       <header style={styles.header}>
         <h2>Job Tracker Dashboard</h2>
-        <button onClick={logout} style={styles.logoutBtn}>
-          Logout
-        </button>
+        <div>
+          <button onClick={() => setModalOpen(true)} style={styles.addBtn}>
+            + Add Job
+          </button>
+          <button onClick={logout} style={styles.logoutBtn}>
+            Logout
+          </button>
+        </div>
       </header>
 
       {/* 📊 STATS */}
@@ -91,8 +109,15 @@ function Dashboard() {
         </p>
       </div>
 
-      {/* 🧩 KANBAN */}
-      <KanbanBoard />
+      {/* 🧩 KANBAN BOARD */}
+      <KanbanBoard jobsData={data.jobs} />
+
+      {/* ➕ Add Job Modal */}
+      <AddJobModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onJobAdded={handleJobAdded}
+      />
     </div>
   );
 }
@@ -116,6 +141,16 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  addBtn: {
+    background: "#10b981",
+    color: "#fff",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    marginRight: "10px",
+    fontWeight: "bold",
   },
   logoutBtn: {
     background: "#fff",

@@ -1,82 +1,81 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState } from "react";
+import API from "../services/api";
 
-const initialData = {
-  Applied: [
-    { id: "1", company: "Google", role: "Frontend Developer" },
-    { id: "2", company: "Meta", role: "React Engineer" },
-  ],
-  Interview: [
-    { id: "3", company: "Amazon", role: "SDE I" },
-  ],
-  Offer: [],
-  Rejected: [],
-};
+const columns = ["applied", "interview", "offer", "rejected"];
 
-export default function KanbanBoard() {
-  const [columns, setColumns] = useState(initialData);
+function KanbanBoard({ jobsData }) {
+  const [jobs, setJobs] = useState(jobsData || []);
 
-  const onDragEnd = (result) => {
-    if (!result.destination) return;
+  const onDragEnd = async (result) => {
+    const { draggableId, destination } = result;
+    if (!destination) return;
 
-    const { source, destination } = result;
+    const jobId = draggableId;
+    const newStatus = destination.droppableId;
 
-    const sourceCol = source.droppableId;
-    const destCol = destination.droppableId;
+    // Update frontend
+    setJobs((prev) =>
+      prev.map((job) =>
+        job.id === parseInt(jobId) ? { ...job, status: newStatus } : job
+      )
+    );
 
-    const sourceItems = [...columns[sourceCol]];
-    const destItems = [...columns[destCol]];
-
-    const [movedItem] = sourceItems.splice(source.index, 1);
-
-    if (sourceCol === destCol) {
-      sourceItems.splice(destination.index, 0, movedItem);
-      setColumns({ ...columns, [sourceCol]: sourceItems });
-    } else {
-      destItems.splice(destination.index, 0, movedItem);
-      setColumns({
-        ...columns,
-        [sourceCol]: sourceItems,
-        [destCol]: destItems,
-      });
+    // Update backend
+    try {
+      await API.patch(`jobs/${jobId}/update_status/`, { status: newStatus });
+    } catch (err) {
+      console.error("Failed to update status", err);
     }
   };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div style={styles.board}>
-        {Object.entries(columns).map(([columnId, items]) => (
-          <Droppable droppableId={columnId} key={columnId}>
+      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
+        {columns.map((col) => (
+          <Droppable droppableId={col} key={col}>
             {(provided) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                style={styles.column}
+                style={{
+                  flex: 1,
+                  minHeight: "300px",
+                  background: "#f0f0f0",
+                  borderRadius: "8px",
+                  padding: "10px",
+                }}
               >
-                <h3>{columnId}</h3>
+                <h4 style={{ textTransform: "capitalize" }}>{col}</h4>
 
-                {items.map((item, index) => (
-                  <Draggable
-                    draggableId={item.id}
-                    index={index}
-                    key={item.id}
-                  >
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={{
-                          ...styles.card,
-                          ...provided.draggableProps.style,
-                        }}
-                      >
-                        <strong>{item.company}</strong>
-                        <p>{item.role}</p>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+                {jobs
+                  .filter((job) => job.status === col)
+                  .map((job, index) => (
+                    <Draggable
+                      draggableId={job.id.toString()}
+                      index={index}
+                      key={job.id}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          style={{
+                            padding: "10px",
+                            marginBottom: "10px",
+                            background: "#fff",
+                            borderRadius: "6px",
+                            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                            ...provided.draggableProps.style,
+                          }}
+                        >
+                          {job.company} - {job.role}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+
                 {provided.placeholder}
               </div>
             )}
@@ -87,24 +86,4 @@ export default function KanbanBoard() {
   );
 }
 
-const styles = {
-  board: {
-    display: "flex",
-    gap: "20px",
-    padding: "20px",
-  },
-  column: {
-    background: "#f4f6fa",
-    padding: "15px",
-    borderRadius: "10px",
-    width: "250px",
-    minHeight: "400px",
-  },
-  card: {
-    background: "#fff",
-    padding: "12px",
-    marginBottom: "10px",
-    borderRadius: "8px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-  },
-};
+export default KanbanBoard;
