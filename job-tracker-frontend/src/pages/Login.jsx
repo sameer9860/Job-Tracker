@@ -6,20 +6,25 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setError(null);
 
     try {
       const res = await API.post("token/", { username, password });
+
+      // Save JWT tokens
       localStorage.setItem("access_token", res.data.access);
       localStorage.setItem("refresh_token", res.data.refresh);
+
+      // Redirect to dashboard
       window.location.href = "/dashboard";
-    } catch {
+    } catch (err) {
+      // Always set string for React
       setError("Invalid username or password");
       setLoading(false);
     }
@@ -28,12 +33,14 @@ function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={styles.title}>Welcome Back </h2>
+        <h2 style={styles.title}>Welcome Back</h2>
         <p style={styles.subtitle}>Login to your Job Tracker</p>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {/* Error message */}
+        {typeof error === "string" && <p style={styles.error}>{error}</p>}
 
         <form onSubmit={handleSubmit}>
+          {/* Username */}
           <input
             style={styles.input}
             placeholder="Username"
@@ -41,6 +48,7 @@ function Login() {
             onChange={(e) => setUsername(e.target.value)}
           />
 
+          {/* Password */}
           <div style={styles.passwordWrapper}>
             <input
               style={styles.input}
@@ -58,6 +66,7 @@ function Login() {
             </span>
           </div>
 
+          {/* Login button */}
           <button style={styles.button} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
@@ -69,6 +78,7 @@ function Login() {
 
 export default Login;
 
+/* 🎨 Styles */
 const styles = {
   container: {
     height: "100vh",

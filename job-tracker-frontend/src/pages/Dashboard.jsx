@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import axios from "axios";
+import KanbanBoard from "../components/KanbanBoard";
+
+
 
 function Dashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // 🔐 Logout
   const logout = () => {
@@ -18,13 +22,13 @@ function Dashboard() {
     const refresh = localStorage.getItem("refresh_token");
     if (!refresh) throw new Error("No refresh token");
 
-    const response = await axios.post(
+    const res = await axios.post(
       "http://127.0.0.1:8000/api/token/refresh/",
       { refresh }
     );
 
-    localStorage.setItem("access_token", response.data.access);
-    return response.data.access;
+    localStorage.setItem("access_token", res.data.access);
+    return res.data.access;
   };
 
   // 📊 Load dashboard
@@ -33,18 +37,19 @@ function Dashboard() {
       const res = await API.get("dashboard/");
       setData(res.data);
     } catch (err) {
-      // If access token expired → refresh
-      if (err.response && err.response.status === 401) {
+      if (err.response?.status === 401) {
         try {
           await refreshToken();
           const retry = await API.get("dashboard/");
           setData(retry.data);
-        } catch (refreshError) {
+        } catch {
           logout();
         }
       } else {
         setError("Failed to load dashboard");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,31 +57,109 @@ function Dashboard() {
     fetchDashboard();
   }, []);
 
-  if (error) return <p>{error}</p>;
-  if (!data) return <p>Loading dashboard...</p>;
+  if (loading) return <p style={styles.center}>Loading dashboard...</p>;
+  if (error) return <p style={styles.error}>{error}</p>;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "40px auto" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>Dashboard</h2>
-        <button onClick={logout}>Logout</button>
+    <div>
+      {/* 🔝 HEADER */}
+      <header style={styles.header}>
+        <h2>Job Tracker Dashboard</h2>
+        <button onClick={logout} style={styles.logoutBtn}>
+          Logout
+        </button>
+      </header>
+
+      {/* 📊 STATS */}
+      <div style={styles.statsGrid}>
+        <StatCard title="Total Applications" value={data.total_applications} />
+        <StatCard title="Applied" value={data.status_counts.applied} />
+        <StatCard title="Interview" value={data.status_counts.interview} />
+        <StatCard title="Offers" value={data.status_counts.offer} />
+        <StatCard title="Rejected" value={data.status_counts.rejected} />
       </div>
 
-      <p><strong>Total Applications:</strong> {data.total_applications}</p>
+      {/* 📈 RATES */}
+      <div style={styles.rateBox}>
+        <p>
+          <strong>Interview Success Rate:</strong>{" "}
+          {data.rates.interview_success_rate}%
+        </p>
+        <p>
+          <strong>Offer Conversion Rate:</strong>{" "}
+          {data.rates.offer_conversion_rate}%
+        </p>
+      </div>
 
-      <h4>Status Counts</h4>
-      <ul>
-        <li>Applied: {data.status_counts.applied}</li>
-        <li>Interview: {data.status_counts.interview}</li>
-        <li>Offer: {data.status_counts.offer}</li>
-        <li>Rejected: {data.status_counts.rejected}</li>
-      </ul>
-
-      <h4>Success Rates</h4>
-      <p>Interview Success Rate: {data.rates.interview_success_rate}%</p>
-      <p>Offer Conversion Rate: {data.rates.offer_conversion_rate}%</p>
+      {/* 🧩 KANBAN */}
+      <KanbanBoard />
     </div>
   );
 }
+
+/* 🔹 Reusable Stat Card */
+function StatCard({ title, value }) {
+  return (
+    <div style={styles.card}>
+      <h4>{title}</h4>
+      <p style={styles.cardValue}>{value}</p>
+    </div>
+  );
+}
+
+/* 🎨 Styles */
+const styles = {
+  header: {
+    background: "#4f46e5",
+    color: "#fff",
+    padding: "15px 30px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  logoutBtn: {
+    background: "#fff",
+    color: "#4f46e5",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  statsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "20px",
+    padding: "30px",
+  },
+  card: {
+    background: "#fff",
+    borderRadius: "12px",
+    padding: "20px",
+    boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
+    textAlign: "center",
+  },
+  cardValue: {
+    fontSize: "28px",
+    fontWeight: "bold",
+    marginTop: "10px",
+    color: "#4f46e5",
+  },
+  rateBox: {
+    margin: "0 30px 20px",
+    padding: "20px",
+    background: "#f9fafb",
+    borderRadius: "10px",
+  },
+  center: {
+    textAlign: "center",
+    marginTop: "50px",
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    marginTop: "50px",
+  },
+};
 
 export default Dashboard;
