@@ -7,9 +7,13 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
       const res = await API.post("token/", { username, password });
       localStorage.setItem("access_token", res.data.access);
@@ -17,59 +21,113 @@ function Login() {
       window.location.href = "/dashboard";
     } catch {
       setError("Invalid username or password");
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "100px auto" }}>
-      <h2>Login</h2>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Welcome Back </h2>
+        <p style={styles.subtitle}>Login to your Job Tracker</p>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p style={styles.error}>{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
-        />
-
-        <div style={{ position: "relative" }}>
+        <form onSubmit={handleSubmit}>
           <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "10px" }}
+            style={styles.input}
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
 
-          <span
-            onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              cursor: "pointer",
-            }}
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
+          <div style={styles.passwordWrapper}>
+            <input
+              style={styles.input}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-        <button
-          type="submit"
-          style={{
-            marginTop: "15px",
-            width: "100%",
-            padding: "10px",
-          }}
-        >
-          Login
-        </button>
-      </form>
+            <span
+              style={styles.eye}
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
+            </span>
+          </div>
+
+          <button style={styles.button} disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
 
 export default Login;
+
+const styles = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "linear-gradient(135deg, #667eea, #764ba2)",
+  },
+  card: {
+    background: "#fff",
+    padding: "40px",
+    borderRadius: "12px",
+    width: "100%",
+    maxWidth: "380px",
+    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+  },
+  title: {
+    marginBottom: "5px",
+    textAlign: "center",
+  },
+  subtitle: {
+    marginBottom: "25px",
+    textAlign: "center",
+    color: "#666",
+    fontSize: "14px",
+  },
+  error: {
+    color: "red",
+    marginBottom: "15px",
+    textAlign: "center",
+  },
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginBottom: "15px",
+    borderRadius: "8px",
+    border: "1px solid #ccc",
+    fontSize: "14px",
+  },
+  passwordWrapper: {
+    position: "relative",
+  },
+  eye: {
+    position: "absolute",
+    right: "12px",
+    top: "50%",
+    transform: "translateY(-50%)",
+    cursor: "pointer",
+    color: "#666",
+  },
+  button: {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "8px",
+    border: "none",
+    background: "#667eea",
+    color: "#fff",
+    fontSize: "16px",
+    cursor: "pointer",
+    marginTop: "10px",
+  },
+};
