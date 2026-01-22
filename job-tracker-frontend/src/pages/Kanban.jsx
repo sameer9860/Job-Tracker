@@ -1,123 +1,109 @@
 import { useEffect, useState } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import API from "../services/api";
 
-// The columns
-const columns = ["applied", "interview", "offer", "rejected"];
+const COLUMNS = [
+  { key: "applied", label: "Applied", color: "#e0e7ff" },
+  { key: "interview", label: "Interview", color: "#fef3c7" },
+  { key: "offer", label: "Offer", color: "#dcfce7" },
+  { key: "rejected", label: "Rejected", color: "#fee2e2" },
+];
 
 function Kanban() {
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [draggedJob, setDraggedJob] = useState(null);
 
-  // Fetch jobs from backend
-  const fetchJobs = async () => {
-    try {
-      const res = await API.get("jobs/");
-      setJobs(res.data);
-    } catch (err) {
-      console.error(err);
-      window.location.href = "/";
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // 🔹 Fetch jobs
   useEffect(() => {
-    fetchJobs();
+    API.get("jobs/")
+      .then((res) => setJobs(res.data))
+      .catch(() => {
+        alert("Session expired");
+        window.location.href = "/";
+      });
   }, []);
 
-  // Handle drag & drop
-  const handleDragEnd = async (result) => {
-    const { source, destination, draggableId } = result;
-
-    if (!destination) return; // dropped outside
-
-    const draggedJob = jobs.find((job) => job.id === parseInt(draggableId));
-
-    // If dropped in same column, do nothing
-    if (source.droppableId === destination.droppableId) return;
-
-    const newStatus = destination.droppableId;
+  // 🔹 Handle drop
+  const handleDrop = async (status) => {
+    if (!draggedJob || draggedJob.status === status) return;
 
     try {
-      // Update backend
-      await API.patch(`jobs/${draggedJob.id}/`, { status: newStatus });
+      await API.patch(`jobs/${draggedJob.id}/`, {
+        status: status,
+      });
 
-      // Update frontend state
       setJobs((prev) =>
         prev.map((job) =>
-          job.id === draggedJob.id ? { ...job, status: newStatus } : job
+          job.id === draggedJob.id
+            ? { ...job, status }
+            : job
         )
       );
     } catch (err) {
-      console.error("Failed to update status:", err);
+      alert("Failed to update status");
     }
   };
 
-  // Group jobs by status
-  const groupedJobs = (status) => jobs.filter((job) => job.status === status);
-
-  if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading jobs...</p>;
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Job Applications Kanban</h2>
+    <div style={styles.page}>
+      <h2 style={styles.title}>Job Applications Kanban</h2>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-          {columns.map((status) => (
-            <Droppable droppableId={status} key={status}>
-              {(provided) => (
+      <div style={styles.board}>
+        {COLUMNS.map((col) => (
+          <div
+            key={col.key}
+            style={{ ...styles.column, background: col.color }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => handleDrop(col.key)}
+          >
+            <h3>{col.label}</h3>
+
+            {jobs
+              .filter((job) => job.status === col.key)
+              .map((job) => (
                 <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={{
-                    flex: 1,
-                    background: "#f4f4f4",
-                    padding: "10px",
-                    borderRadius: "8px",
-                    minHeight: "400px",
-                  }}
+                  key={job.id}
+                  style={styles.card}
+                  draggable
+                  onDragStart={() => setDraggedJob(job)}
                 >
-                  <h3 style={{ textTransform: "capitalize" }}>{status}</h3>
-
-                  {groupedJobs(status).map((job, index) => (
-                    <Draggable
-                      draggableId={job.id.toString()}
-                      index={index}
-                      key={job.id}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            background: "#fff",
-                            padding: "10px",
-                            marginBottom: "10px",
-                            borderRadius: "6px",
-                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          <strong>{job.company}</strong>
-                          <p>{job.role}</p>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-
-                  {provided.placeholder}
+                  <strong>{job.company}</strong>
+                  <p>{job.role}</p>
                 </div>
-              )}
-            </Droppable>
-          ))}
-        </div>
-      </DragDropContext>
+              ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 export default Kanban;
 
+/* 🎨 Styles */
+const styles = {
+  page: {
+    padding: "30px",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: "20px",
+  },
+  board: {
+    display: "flex",
+    gap: "20px",
+  },
+  column: {
+    flex: 1,
+    padding: "15px",
+    borderRadius: "12px",
+    minHeight: "400px",
+  },
+  card: {
+    background: "#fff",
+    padding: "12px",
+    borderRadius: "8px",
+    marginBottom: "10px",
+    cursor: "grab",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+  },
+};

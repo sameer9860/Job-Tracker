@@ -5,14 +5,14 @@ from .models import JobApplication, JobStatusHistory, Reminder
 class JobStatusHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = JobStatusHistory
-        fields = ['status', 'changed_at']
+        fields = ["status", "changed_at"]
 
 
 class ReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reminder
-        fields = '__all__'
-        read_only_fields = ['job_application']
+        fields = "__all__"
+        read_only_fields = ["job_application"]
 
 
 class JobApplicationSerializer(serializers.ModelSerializer):
@@ -21,5 +21,10 @@ class JobApplicationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = JobApplication
-        fields = '__all__'
-        read_only_fields = ['user', 'status', 'created_at', 'updated_at']
+        fields = "__all__"
+        read_only_fields = [
+            "id",
+            "user",
+            "created_at",
+            "updated_at",
+        ]
