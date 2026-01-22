@@ -154,7 +154,7 @@ EMAIL_PORT = 1025
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 
-DEFAULT_FROM_EMAIL = "jobtracker@localhost"
+DEFAULT_FROM_EMAIL = "no-reply@jobtracker.com"
 
 #for production use Gmail SMTP
 # if DEBUG:
