@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import axios from "axios";
-import KanbanBoard from "../components/KanbanBoard";
+
 import AddJobModal from "../components/AddJobModal";
+import StatusChart from "../components/charts/StatusChart";
+import FunnelStats from "../components/charts/FunnelStats";
 
 function Dashboard() {
   const [data, setData] = useState(null);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
 
-  // 🔐 Logout
+  /* 🔐 Logout */
   const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     window.location.href = "/";
   };
 
-  // 🔁 Refresh token
+  /* 🔁 Refresh token */
   const refreshToken = async () => {
     const refresh = localStorage.getItem("refresh_token");
-    if (!refresh) throw new Error("No refresh token");
-
     const res = await axios.post(
       "http://127.0.0.1:8000/api/token/refresh/",
       { refresh }
@@ -30,18 +30,17 @@ function Dashboard() {
     return res.data.access;
   };
 
-  // 📊 Load dashboard
+  /* 📊 Load dashboard */
   const fetchDashboard = async () => {
     try {
       const res = await API.get("dashboard/");
-      // Ensure jobs array exists
-      setData({ ...res.data, jobs: res.data.jobs || [] });
+      setData(res.data);
     } catch (err) {
       if (err.response?.status === 401) {
         try {
           await refreshToken();
           const retry = await API.get("dashboard/");
-          setData({ ...retry.data, jobs: retry.data.jobs || [] });
+          setData(retry.data);
         } catch {
           logout();
         }
@@ -57,143 +56,144 @@ function Dashboard() {
     fetchDashboard();
   }, []);
 
-  // ✅ Handle adding new job
-  const handleJobAdded = (newJob) => {
-    setData((prev) => ({
-      ...prev,
-      jobs: [newJob, ...prev.jobs],
-      total_applications: prev.total_applications + 1,
-      status_counts: {
-        ...prev.status_counts,
-        [newJob.status]: prev.status_counts[newJob.status] + 1,
-      },
-    }));
-  };
-
   if (loading) return <p style={styles.center}>Loading dashboard...</p>;
   if (error) return <p style={styles.error}>{error}</p>;
+  if (!data) return null; // safety check
 
   return (
-    <div>
+    <div style={styles.page}>
       {/* 🔝 HEADER */}
       <header style={styles.header}>
-        <h2>Job Tracker Dashboard</h2>
         <div>
-          <button onClick={() => setModalOpen(true)} style={styles.addBtn}>
+          <h2 style={styles.title}>Job Application Dashboard</h2>
+          <p style={styles.subtitle}>
+            Track your progress and job search performance
+          </p>
+        </div>
+        <div>
+          <button style={styles.addBtn} onClick={() => setModalOpen(true)}>
             + Add Job
           </button>
-          <button onClick={logout} style={styles.logoutBtn}>
+          <button style={styles.logoutBtn} onClick={logout}>
             Logout
           </button>
         </div>
       </header>
 
       {/* 📊 STATS */}
-      <div style={styles.statsGrid}>
-        <StatCard title="Total Applications" value={data.total_applications} />
-        <StatCard title="Applied" value={data.status_counts.applied} />
-        <StatCard title="Interview" value={data.status_counts.interview} />
-        <StatCard title="Offers" value={data.status_counts.offer} />
-        <StatCard title="Rejected" value={data.status_counts.rejected} />
-      </div>
+      <section style={styles.statsGrid}>
+        <StatCard
+          label="Total Applications"
+          value={data.total_applications}
+          color="#4f46e5"
+        />
+        <StatCard label="Applied" value={data.status_counts.applied} color="#2563eb" />
+        <StatCard
+          label="Interview"
+          value={data.status_counts.interview}
+          color="#f59e0b"
+        />
+        <StatCard label="Offers" value={data.status_counts.offer} color="#10b981" />
+        <StatCard
+          label="Rejected"
+          value={data.status_counts.rejected}
+          color="#ef4444"
+        />
+      </section>
 
-      {/* 📈 RATES */}
-      <div style={styles.rateBox}>
-        <p>
-          <strong>Interview Success Rate:</strong>{" "}
-          {data.rates.interview_success_rate}%
-        </p>
-        <p>
-          <strong>Offer Conversion Rate:</strong>{" "}
-          {data.rates.offer_conversion_rate}%
-        </p>
-      </div>
-
-      {/* 🧩 KANBAN BOARD */}
-      <KanbanBoard jobsData={data.jobs} />
+      {/* 📈 CHARTS */}
+      <section style={{ padding: "0 30px 30px 30px" }}>
+        <StatusChart stats={data.status_counts} />
+        <FunnelStats stats={data.status_counts} />
+      </section>
 
       {/* ➕ Add Job Modal */}
       <AddJobModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onJobAdded={handleJobAdded}
+        onJobAdded={() => fetchDashboard()}
       />
     </div>
   );
 }
 
-/* 🔹 Reusable Stat Card */
-function StatCard({ title, value }) {
+/* 🔹 Stat Card */
+function StatCard({ label, value, color }) {
   return (
-    <div style={styles.card}>
-      <h4>{title}</h4>
-      <p style={styles.cardValue}>{value}</p>
+    <div style={{ ...styles.statCard, borderLeft: `6px solid ${color}` }}>
+      <p style={styles.statLabel}>{label}</p>
+      <h3 style={{ ...styles.statValue, color }}>{value}</h3>
     </div>
   );
 }
 
 /* 🎨 Styles */
 const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "linear-gradient(180deg, #eef2ff, #f9fafb)",
+  },
   header: {
-    background: "#4f46e5",
-    color: "#fff",
-    padding: "15px 30px",
+    padding: "30px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
+    background: "#ffffff",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+  },
+  title: {
+    margin: 0,
+    color: "#1f2937",
+  },
+  subtitle: {
+    marginTop: "6px",
+    color: "#6b7280",
   },
   addBtn: {
-    background: "#10b981",
+    background: "#4f46e5",
     color: "#fff",
     border: "none",
-    padding: "8px 16px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    marginRight: "10px",
+    padding: "10px 18px",
+    borderRadius: "10px",
     fontWeight: "bold",
+    marginRight: "10px",
+    cursor: "pointer",
   },
   logoutBtn: {
     background: "#fff",
-    color: "#4f46e5",
-    border: "none",
-    padding: "8px 16px",
-    borderRadius: "6px",
+    border: "1px solid #e5e7eb",
+    padding: "10px 18px",
+    borderRadius: "10px",
     cursor: "pointer",
-    fontWeight: "bold",
   },
   statsGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
     gap: "20px",
     padding: "30px",
   },
-  card: {
+  statCard: {
     background: "#fff",
-    borderRadius: "12px",
     padding: "20px",
-    boxShadow: "0 6px 18px rgba(0,0,0,0.1)",
-    textAlign: "center",
+    borderRadius: "16px",
+    boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
   },
-  cardValue: {
-    fontSize: "28px",
-    fontWeight: "bold",
+  statLabel: {
+    color: "#6b7280",
+    fontSize: "14px",
+  },
+  statValue: {
+    fontSize: "30px",
     marginTop: "10px",
-    color: "#4f46e5",
-  },
-  rateBox: {
-    margin: "0 30px 20px",
-    padding: "20px",
-    background: "#f9fafb",
-    borderRadius: "10px",
   },
   center: {
     textAlign: "center",
-    marginTop: "50px",
+    marginTop: "60px",
   },
   error: {
     color: "red",
     textAlign: "center",
-    marginTop: "50px",
+    marginTop: "60px",
   },
 };
 
