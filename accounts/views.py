@@ -1,58 +1,58 @@
-from rest_framework import generics, status
+# accounts/views.py
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.contrib.auth.models import User
-from .models import PasswordResetOTP
-from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
-from django.core.mail import send_mail
+from .models import OTP
+from .serializers import PasswordResetEmailSerializer, OTPVerifySerializer, PasswordResetSerializer
 import random
+from django.core.mail import send_mail
+from django.conf import settings
 
-class PasswordResetRequestView(generics.GenericAPIView):
-    serializer_class = PasswordResetRequestSerializer
+def send_otp_email(email, code):
+    send_mail(
+        subject="Your OTP Code",
+        message=f"Your OTP is: {code}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
 
+class PasswordResetRequestView(APIView):
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
+        serializer = PasswordResetEmailSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
-        user = User.objects.filter(email=email).first()
-        if not user:
-            return Response({"detail": "User with this email does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        
-        # Generate OTP
-        otp = str(random.randint(100000, 999999))
-        PasswordResetOTP.objects.create(user=user, otp=otp)
 
-        # Send email using MailHog
-        send_mail(
-            subject="Your OTP for Password Reset",
-            message=f"Your OTP is {otp}. It expires in 10 minutes.",
-            from_email="no-reply@jobtracker.com",
-            recipient_list=[email],
-        )
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({"detail": "OTP sent to email"}, status=status.HTTP_200_OK)
+        code = str(random.randint(100000, 999999))
+        OTP.objects.create(user=user, code=code)
+        send_otp_email(email, code)
+        return Response({"detail": "OTP sent to email."})
 
-
-class PasswordResetConfirmView(generics.GenericAPIView):
-    serializer_class = PasswordResetConfirmSerializer
-
+class PasswordResetConfirmView(APIView):
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
+        serializer = PasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
-        otp = serializer.validated_data['otp']
-        new_password = serializer.validated_data['new_password1']
+        otp_code = serializer.validated_data['otp']
+        password = serializer.validated_data['password1']
 
-        user = User.objects.filter(email=email).first()
-        if not user:
-            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "Invalid email."}, status=status.HTTP_400_BAD_REQUEST)
 
-        otp_obj = PasswordResetOTP.objects.filter(user=user, otp=otp, is_used=False).first()
-        if not otp_obj or not otp_obj.is_valid():
-            return Response({"detail": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        otp_qs = OTP.objects.filter(user=user, code=otp_code).order_by('-created_at')
+        if not otp_qs.exists() or not otp_qs.first().is_valid():
+            return Response({"detail": "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.set_password(new_password)
+        user.set_password(password)
         user.save()
-        otp_obj.is_used = True
-        otp_obj.save()
+        otp_qs.delete()  # optional: remove OTP after use
 
-        return Response({"detail": "Password reset successful"}, status=status.HTTP_200_OK)
+        return Response({"detail": "Password reset successful."})
