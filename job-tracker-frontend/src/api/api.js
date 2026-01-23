@@ -30,5 +30,8 @@ export const setNewPassword = (
   });
 
 
+export const changePassword = (new_password1, new_password2) =>
+  API.put("change-password/", { new_password1, new_password2 });
+
 
 export default API;

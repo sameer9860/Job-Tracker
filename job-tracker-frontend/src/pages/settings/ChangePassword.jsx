@@ -1,11 +1,10 @@
 import { useState } from "react";
-import API from "../../services/api";
+import API from "../../api/api";
 import { useNavigate } from "react-router-dom";
 
 export default function ChangePassword() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    old_password: "",
     new_password1: "",
     new_password2: "",
   });
@@ -18,7 +17,7 @@ export default function ChangePassword() {
     e.preventDefault();
 
     try {
-      await API.put("accounts/change-password/", formData);
+      await API.put("change-password/", formData);
 
       // 🔐 LOGOUT AFTER PASSWORD CHANGE
       localStorage.removeItem("access");
@@ -36,13 +35,7 @@ export default function ChangePassword() {
       <h2>Change Password</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="password"
-          name="old_password"
-          placeholder="Current Password"
-          onChange={handleChange}
-          required
-        />
+      
 
         <input
           type="password"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import axios from "axios";
+
 import ProfileView from "../components/profile/ProfileView";
 import AddJobModal from "../components/AddJobModal";
 import StatusChart from "../components/charts/StatusChart";
