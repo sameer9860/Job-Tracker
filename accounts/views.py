@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 import random
 from .serializers import RegisterSerializer
+from django.contrib.auth.models import User
 
 from .models import PasswordResetOTP
 from .serializers import (
@@ -137,12 +138,26 @@ class SetNewPasswordView(APIView):
         )
 
 class RegisterView(APIView):
+    permission_classes = [AllowAny]  # 🔥 THIS LINE FIXES 401
+
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if User.objects.filter(username=username).exists():
             return Response(
-                {"detail": "Registration successful. Please login."},
-                status=status.HTTP_201_CREATED
+                {"detail": "Username already exists"},
+                status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        return Response(
+            {"detail": "Registration successful"},
+            status=status.HTTP_201_CREATED
+        )

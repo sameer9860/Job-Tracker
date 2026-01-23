@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'jobs.apps.JobsConfig',
-    'accounts',
+    'accounts.apps.AccountsConfig',
     'corsheaders',
     'background_task',
+    
+    
     
 ]
 

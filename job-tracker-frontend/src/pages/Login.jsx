@@ -54,7 +54,10 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <span style={styles.eye} onClick={() => setShowPassword(!showPassword)}>
+            <span
+              style={styles.eye}
+              onClick={() => setShowPassword(!showPassword)}
+            >
               {showPassword ? <FaEye /> : <FaEyeSlash />}
             </span>
           </div>
@@ -68,9 +71,27 @@ function Login() {
         <p style={{ marginTop: "12px" }}>
           <Link
             to="/forget-password"
-            style={{ color: "#4f46e5", textDecoration: "none", fontWeight: "bold" }}
+            style={{
+              color: "#4f46e5",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
           >
             Forgot Password?
+          </Link>
+        </p>
+        {/* 🔗 Register Link */}
+        <p style={{ marginTop: "10px" }}>
+          Don&apos;t have an account?{" "}
+          <Link
+            to="/register"
+            style={{
+              color: "#facc15",
+              textDecoration: "none",
+              fontWeight: "bold",
+            }}
+          >
+            Register
           </Link>
         </p>
       </div>
