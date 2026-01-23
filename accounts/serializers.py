@@ -55,9 +55,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     email = serializers.EmailField(source="user.email", read_only=True)
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
-        model = UserProfile  # not User, because you want extra fields
+        model = UserProfile
         fields = [
             "username",
             "email",
@@ -65,3 +66,28 @@ class ProfileSerializer(serializers.ModelSerializer):
             "bio",
             "avatar",
         ]
+
+    def get_avatar(self, obj):
+        request = self.context.get("request")
+
+        if obj.avatar:
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+
+        # default avatar fallback
+        default_path = "/media/avatars/default.png"
+        if request:
+            return request.build_absolute_uri(default_path)
+        return default_path
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password1 = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs["new_password1"] != attrs["new_password2"]:
+            raise serializers.ValidationError("New passwords do not match")
+        validate_password(attrs["new_password1"])
+        return attrs

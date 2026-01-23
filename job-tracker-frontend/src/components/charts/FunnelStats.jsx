@@ -12,7 +12,7 @@ export default function FunnelStats({ stats, theme }) {
   return (
     <div style={{ background: theme === "light" ? "#fff" : "#2d2d3d", padding: "20px", borderRadius: "16px" }}>
       <h3 style={{ color: theme === "light" ? "#1f2937" : "#f3f4f6" }}>Application Funnel</h3>
-      <FunnelChart width={870} height={300}>
+      <FunnelChart width={850} height={300}>
         <Tooltip
           contentStyle={{ backgroundColor: theme === "light" ? "#fff" : "#1f1f2e", border: "none", color: theme === "light" ? "#1f2937" : "#f3f4f6" }}
         />

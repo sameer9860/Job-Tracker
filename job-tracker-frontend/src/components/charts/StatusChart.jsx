@@ -17,7 +17,7 @@ export default function StatusChart({ stats, theme }) {
   return (
     <div style={{ background: theme === "light" ? "#fff" : "#2d2d3d", padding: "20px", borderRadius: "16px", marginBottom: "20px" }}>
       <h3 style={{ color: theme === "light" ? "#1f2937" : "#f3f4f6" }}>Application Status</h3>
-      <PieChart width={870} height={300}>
+      <PieChart width={850} height={300}>
         <Pie
           data={data}
           cx="50%"

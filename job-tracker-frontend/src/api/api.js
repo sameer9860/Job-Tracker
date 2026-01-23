@@ -29,4 +29,6 @@ export const setNewPassword = (
     new_password2,
   });
 
+
+
 export default API;
