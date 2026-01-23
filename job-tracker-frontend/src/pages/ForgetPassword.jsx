@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import navigation hook
 import EnterEmail from "../components/PasswordReset/EnterEmail";
 import OTPVerify from "../components/PasswordReset/OTPVerify";
 import SetNewPassword from "../components/PasswordReset/SetNewPassword";
@@ -7,6 +8,7 @@ export default function ForgetPassword() {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const navigate = useNavigate(); // ✅ Initialize navigation
 
   return (
     <div>
@@ -33,15 +35,17 @@ export default function ForgetPassword() {
         <SetNewPassword
           email={email}
           otp={otp}
-          onSuccess={() => setStep(4)}
+          onSuccess={() => {
+            setStep(4);
+            // ✅ Redirect to login after short delay
+            setTimeout(() => {
+              navigate("/");
+            }, 2000);
+          }}
         />
       )}
 
-      {step === 4 && (
-        <p style={{ textAlign: "center", marginTop: "40px" }}>
-          ✅ Password changed successfully! You can now login.
-        </p>
-      )}
+    
     </div>
   );
 }

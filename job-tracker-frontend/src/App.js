@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
-
+        
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/kanban" element={<Kanban />} />
       </Routes>
