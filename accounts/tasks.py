@@ -2,8 +2,13 @@ from background_task import background
 from django.core.mail import send_mail
 from django.conf import settings
 
-@background(schedule=5)  # 5 seconds later
+
+@background(schedule=1)
 def send_otp_email(email, otp_code):
-    subject = "Your OTP for Password Reset"
-    message = f"Your OTP code is: {otp_code}\nIt is valid for 10 minutes."
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+    send_mail(
+        subject="Your Password Reset OTP",
+        message=f"Your OTP code is {otp_code}",
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )

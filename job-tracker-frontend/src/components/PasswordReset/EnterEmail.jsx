@@ -7,18 +7,21 @@ export default function EnterEmail({ onNext }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
     try {
       const res = await requestPasswordReset(email);
       setMessage(res.data.detail);
       onNext(email);
     } catch (err) {
-      setMessage(err.response?.data.detail || "Something went wrong");
+      setMessage(err.response?.data?.detail || "Something went wrong");
     }
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "40px auto" }}>
       <h2>Forgot Password</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -28,11 +31,20 @@ export default function EnterEmail({ onNext }) {
           required
           style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
         />
-        <button type="submit" style={{ width: "100%", padding: "10px", background: "#4f46e5", color: "#fff" }}>
+
+        <button type="submit" style={btnStyle}>
           Send OTP
         </button>
       </form>
+
       {message && <p>{message}</p>}
     </div>
   );
 }
+
+const btnStyle = {
+  width: "100%",
+  padding: "10px",
+  background: "#4f46e5",
+  color: "#fff",
+};

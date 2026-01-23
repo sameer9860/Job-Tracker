@@ -7,18 +7,21 @@ export default function OTPVerify({ email, onNext }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
     try {
       const res = await verifyOTP(email, otp);
       setMessage(res.data.detail);
-      onNext();
+      onNext(otp); // 🔥 IMPORTANT FIX
     } catch (err) {
-      setMessage(err.response?.data.detail || "Invalid OTP");
+      setMessage(err.response?.data?.detail || "Invalid OTP");
     }
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "40px auto" }}>
       <h2>Verify OTP</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -28,11 +31,20 @@ export default function OTPVerify({ email, onNext }) {
           required
           style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
         />
-        <button type="submit" style={{ width: "100%", padding: "10px", background: "#4f46e5", color: "#fff" }}>
+
+        <button type="submit" style={btnStyle}>
           Verify
         </button>
       </form>
+
       {message && <p>{message}</p>}
     </div>
   );
 }
+
+const btnStyle = {
+  width: "100%",
+  padding: "10px",
+  background: "#4f46e5",
+  color: "#fff",
+};

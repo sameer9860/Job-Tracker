@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../services/api";
 
 export default function Login() {
@@ -17,14 +17,16 @@ export default function Login() {
       localStorage.setItem("refresh_token", res.data.refresh);
       navigate("/dashboard");
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Invalid username or password");
     }
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
       <h2>Login</h2>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
+
       <form onSubmit={handleLogin}>
         <input
           type="text"
@@ -34,6 +36,7 @@ export default function Login() {
           required
           style={{ padding: "10px", width: "100%", marginBottom: "10px" }}
         />
+
         <input
           type="password"
           placeholder="Password"
@@ -42,10 +45,20 @@ export default function Login() {
           required
           style={{ padding: "10px", width: "100%", marginBottom: "15px" }}
         />
-        <button type="submit" style={{ padding: "10px 20px" }}>Login</button>
+
+        <button type="submit" style={{ padding: "10px 20px", width: "100%" }}>
+          Login
+        </button>
       </form>
-      <p style={{ marginTop: "10px" }}>
-        <a href="/forgot-password">Forgot Password?</a>
+
+      {/* 🔐 Forgot Password */}
+      <p style={{ marginTop: "12px" }}>
+        <Link
+          to="/forget-password"
+          style={{ color: "#4f46e5", textDecoration: "none", fontWeight: "bold" }}
+        >
+          Forgot Password?
+        </Link>
       </p>
     </div>
   );

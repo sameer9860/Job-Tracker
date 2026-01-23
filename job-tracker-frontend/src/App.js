@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import ForgetPassword from "./pages/ForgetPassword";
-
 import Dashboard from "./pages/Dashboard";
 import Kanban from "./pages/Kanban";
 
