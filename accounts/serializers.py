@@ -82,12 +82,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         return default_path
 
 class ChangePasswordSerializer(serializers.Serializer):
-    new_password1 = serializers.CharField(write_only=True)
-    new_password2 = serializers.CharField(write_only=True)
+    new_password1 = serializers.CharField()
+    new_password2 = serializers.CharField()
 
     def validate(self, attrs):
         if attrs["new_password1"] != attrs["new_password2"]:
             raise serializers.ValidationError("Passwords do not match")
-
+        
         validate_password(attrs["new_password1"])
+
         return attrs
