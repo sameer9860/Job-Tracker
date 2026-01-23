@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 import random
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, ProfileSerializer
 from django.contrib.auth.models import User
 
 from .models import PasswordResetOTP
@@ -161,3 +161,21 @@ class RegisterView(APIView):
             {"detail": "Registration successful"},
             status=status.HTTP_201_CREATED
         )
+        
+class ProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        serializer = ProfileSerializer(request.user.profile)
+        return Response(serializer.data)
+
+    def put(self, request):
+        serializer = ProfileSerializer(
+            request.user.profile,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
