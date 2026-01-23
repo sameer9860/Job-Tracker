@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import PasswordResetOTP
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
@@ -22,3 +24,30 @@ class SetNewPasswordSerializer(serializers.Serializer):
         if attrs["new_password1"] != attrs["new_password2"]:
             raise serializers.ValidationError("Passwords do not match")
         return attrs
+
+class RegisterSerializer(serializers.ModelSerializer):
+    confirm_password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password", "confirm_password"]
+        extra_kwargs = {
+            "password": {"write_only": True}
+        }
+
+    def validate(self, data):
+        if data["password"] != data["confirm_password"]:
+            raise serializers.ValidationError("Passwords do not match")
+
+        validate_password(data["password"])
+        return data
+
+    def create(self, validated_data):
+        validated_data.pop("confirm_password")
+
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"]
+        )
+        return user

@@ -16,3 +16,14 @@ class PasswordResetOTP(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.otp_code}"
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(
+        upload_to="avatars/",
+        default="avatars/default.png",
+        blank=True
+    )
+
+    def __str__(self):
+        return self.user.username

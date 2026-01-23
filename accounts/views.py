@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
 import random
+from .serializers import RegisterSerializer
 
 from .models import PasswordResetOTP
 from .serializers import (
@@ -134,3 +135,14 @@ class SetNewPasswordView(APIView):
             {"detail": "Password changed successfully"},
             status=status.HTTP_200_OK
         )
+
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"detail": "Registration successful. Please login."},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

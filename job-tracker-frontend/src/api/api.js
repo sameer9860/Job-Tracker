@@ -7,6 +7,9 @@ const API = axios.create({
   },
 });
 
+export const registerUser = (data) =>
+  API.post("register/", data);
+
 export const requestPasswordReset = (email) =>
   API.post("password-reset-request/", { email });
 
