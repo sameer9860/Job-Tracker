@@ -7,6 +7,7 @@ export default function ChangePassword() {
 
   const [formData, setFormData] = useState({
     username: "",
+    old_password: "",
     new_password1: "",
     new_password2: "",
   });
@@ -25,15 +26,15 @@ export default function ChangePassword() {
     try {
       await changePasswordAPI(
         formData.username,
+        formData.old_password,
         formData.new_password1,
         formData.new_password2
       );
 
-      // logout user
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
 
-      alert("Password changed successfully. Please login again.");
+      alert("Password changed. Please login again.");
       navigate("/");
     } catch (err) {
       alert(err.response?.data?.error || "Password change failed");
@@ -49,7 +50,14 @@ export default function ChangePassword() {
           type="text"
           name="username"
           placeholder="Username"
-          value={formData.username}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          type="password"
+          name="old_password"
+          placeholder="Old Password"
           onChange={handleChange}
           required
         />
@@ -58,7 +66,6 @@ export default function ChangePassword() {
           type="password"
           name="new_password1"
           placeholder="New Password"
-          value={formData.new_password1}
           onChange={handleChange}
           required
         />
@@ -67,7 +74,6 @@ export default function ChangePassword() {
           type="password"
           name="new_password2"
           placeholder="Confirm New Password"
-          value={formData.new_password2}
           onChange={handleChange}
           required
         />

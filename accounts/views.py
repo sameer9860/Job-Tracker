@@ -183,31 +183,30 @@ class ProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
+
 class ChangePasswordView(APIView):
+    permission_classes = [AllowAny]
 
     def put(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+
+        if not serializer.is_valid():
+            print("SERIALIZER ERRORS:", serializer.errors)  # 👈 THIS
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         username = request.data.get("username")
         if not username:
-            return Response(
-                {"error": "Username is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Username is required"}, status=400)
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return Response(
-                {"error": "User not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "User not found"}, status=404)
+
+        if not user.check_password(serializer.validated_data["old_password"]):
+            return Response({"error": "Old password is incorrect"}, status=400)
 
         user.set_password(serializer.validated_data["new_password1"])
         user.save()
 
-        return Response(
-            {"message": "Password changed successfully"},
-            status=status.HTTP_200_OK
-        )
+        return Response({"message": "Password changed successfully"}, status=200)
