@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import PasswordResetOTP, UserProfile
 from django.contrib.auth.password_validation import validate_password
-
+from django.contrib.auth.decorators import login_required
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -80,15 +80,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(default_path)
         return default_path
-
 class ChangePasswordSerializer(serializers.Serializer):
-    new_password1 = serializers.CharField()
-    new_password2 = serializers.CharField()
+    new_password1 = serializers.CharField(min_length=8, write_only=True)
+    new_password2 = serializers.CharField(min_length=8, write_only=True)
 
     def validate(self, attrs):
         if attrs["new_password1"] != attrs["new_password2"]:
             raise serializers.ValidationError("Passwords do not match")
         
-        validate_password(attrs["new_password1"])
 
         return attrs

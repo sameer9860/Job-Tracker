@@ -7,6 +7,7 @@ import random
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import RegisterSerializer, ProfileSerializer, ChangePasswordSerializer
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 from .models import PasswordResetOTP
 from .serializers import (
@@ -181,18 +182,32 @@ class ProfileView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    
 class ChangePasswordView(APIView):
-    permission_classes = [AllowAny]
 
-    def post(self, request):
+    def put(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = request.user
+        username = request.data.get("username")
+        if not username:
+            return Response(
+                {"error": "Username is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         user.set_password(serializer.validated_data["new_password1"])
         user.save()
 
         return Response(
-            {"message": "Password changed successfully. Please login again."},
+            {"message": "Password changed successfully"},
             status=status.HTTP_200_OK
         )

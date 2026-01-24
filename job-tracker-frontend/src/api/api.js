@@ -29,9 +29,12 @@ export const setNewPassword = (
     new_password2,
   });
 
-
-export const changePassword = (new_password1, new_password2) =>
-  API.post("change-password/", { new_password1, new_password2 });
-
+/* ✅ RENAME THIS */
+export const changePasswordAPI = (username, new_password1, new_password2) =>
+  API.put("change-password/", {
+    username,
+    new_password1,
+    new_password2,
+  });
 
 export default API;

@@ -7,7 +7,7 @@ urlpatterns = [
     path("otp-verify/", OTPVerifyView.as_view(), name="otp_verify"),
     path("set-new-password/", SetNewPasswordView.as_view(), name="set_new_password"),
     path("profile/", ProfileView.as_view()),
-    path("change-password/", ChangePasswordView.as_view()),
+    path("change-password/", ChangePasswordView.as_view(), name="change_password"),
 
 
 ]

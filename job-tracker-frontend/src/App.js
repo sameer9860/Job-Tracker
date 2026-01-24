@@ -4,7 +4,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import Kanban from "./pages/Kanban";
-import Settings from "./pages/settings";
+import Settings from "./pages/settings/index";
 import ChangePassword from "./pages/settings/ChangePassword";
 
 
