@@ -189,24 +189,43 @@ class ChangePasswordView(APIView):
 
     def put(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            print("SERIALIZER ERRORS:", serializer.errors)  # 👈 THIS
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
 
         username = request.data.get("username")
         if not username:
-            return Response({"error": "Username is required"}, status=400)
+            return Response(
+                {"username": "Username is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
+            return Response(
+                {"username": "User not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
+        # ✅ old password check
         if not user.check_password(serializer.validated_data["old_password"]):
-            return Response({"error": "Old password is incorrect"}, status=400)
+            return Response(
+                {"old_password": "Old password is incorrect"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        user.set_password(serializer.validated_data["new_password1"])
+        new_password = serializer.validated_data["new_password1"]
+
+        # ✅ 8 character validation (EXPLICIT)
+        if len(new_password) < 8:
+            return Response(
+                {"new_password1": "Password must be at least 8 characters long"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.set_password(new_password)
         user.save()
 
-        return Response({"message": "Password changed successfully"}, status=200)
+        return Response(
+            {"message": "Password changed successfully. Please login again."},
+            status=status.HTTP_200_OK
+        )

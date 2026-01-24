@@ -179,39 +179,43 @@ function Dashboard() {
                 </div>
               </div>
 
-              {profileOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "50px",
-                    right: 0,
-                    background: isDark ? "#2d2d3d" : "#fff",
-                    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    zIndex: 10,
-                    minWidth: "160px",
-                  }}
-                >
-                  <button
-                    style={styles.profileItem}
-                    onClick={() => setProfilePage(true)}
-                  >
-                    👤 Profile
-                  </button>
+             {profileOpen && (
+  <div
+    style={{
+      position: "absolute",
+      top: "50px",
+      right: 0,
+      background: isDark ? "#2d2d3d" : "#fff",
+      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+      borderRadius: "12px",
+      overflow: "hidden",
+      zIndex: 10,
+      minWidth: "180px",
+    }}
+  >
+    <button
+      style={styles.profileItem}
+      onClick={() => setProfilePage(true)}
+    >
+      👤 Profile
+    </button>
 
-                  <button
-                    style={styles.profileItem}
-                    onClick={() => navigate("/settings")}
-                  >
-                    ⚙️ Settings
-                  </button>
+    <button
+      style={styles.profileItem}
+      onClick={() => navigate("/change-password")}
+    >
+      🔒 Change Password
+    </button>
 
-                  <button style={styles.profileItem} onClick={logout}>
-                    🚪 Logout
-                  </button>
-                </div>
-              )}
+    <button
+      style={styles.profileItem}
+      onClick={logout}
+    >
+      🚪 Logout
+    </button>
+  </div>
+)}
+
             </div>
           )}
         </div>
