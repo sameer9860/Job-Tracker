@@ -1,36 +1,193 @@
-# 🚀 Job Tracker System - Installation Guide
+# 🚀 Job Tracker System – Installation & Setup Guide
 
-# 1. Clone the Repository
+A full-stack **Job Tracker System** built with **Django (Backend)** and **React (Frontend)** to manage and track job applications efficiently.
+
+---
+
+## 📌 Prerequisites
+
+Before starting, ensure you have the following installed:
+
+* Python **3.10+**
+* Node.js **18+** and npm
+* Git
+* Virtual environment support
+
+---
+
+## 🖼️ Application Screenshots
+
+All screenshots are stored in the **`CodeSnaps/`** folder.
+
+### 📊 Dashboard
+
+```md
+![Dashboard](CodeSnaps/dashboard.png)
+```
+
+### 🔐 Login Page
+
+```md
+![Login](CodeSnaps/login.png)
+```
+
+### 📋 Job Listings
+
+```md
+![Jobs](CodeSnaps/jobs.png)
+```
+
+➡️ **More screenshots (12+)** are available inside:
+
+```
+CodeSnaps/
+```
+
+You can include any image in README like this:
+
+```md
+![Screenshot](CodeSnaps/image-name.png)
+```
+
+---
+
+## 🔹 Installation Guide
+
+### 🔸 Backend Setup (Django)
+
+#### 1️⃣ Clone the Repository
+
+```bash
 git clone https://github.com/sameer9860/Job-Tracker.git
+cd Job-Tracker
+```
 
-cd jobtracker
+---
 
-# 2. Create Virtual Environment
+#### 2️⃣ Create Virtual Environment
+
+```bash
 python -m venv env
+```
 
-# 3. Activate Virtual Environment
-# Windows (PowerShell)
+---
+
+#### 3️⃣ Activate Virtual Environment
+
+**Windows (PowerShell)**
+
+```powershell
 .\env\Scripts\activate
-# windows(CMD)
+```
+
+**Windows (CMD)**
+
+```cmd
 env\Scripts\activate
-# macOS/Linux
+```
+
+**macOS / Linux**
+
+```bash
 source env/bin/activate
+```
 
-# 4. Install Dependencies
+---
+
+#### 4️⃣ Install Backend Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# 5. Apply Database Migrations
+---
+
+#### 5️⃣ Apply Database Migrations
+
+```bash
 python manage.py migrate
+```
 
-# 6. Create Superuser (Admin)
+---
+
+#### 6️⃣ Create Superuser (Admin)
+
+```bash
 python manage.py createsuperuser
-# 👉 Follow the prompts to set up your admin account
+```
 
-# 7. Run Development Server
+👉 Follow the prompts to create an admin account.
+
+---
+
+#### 7️⃣ Run Django Development Server
+
+```bash
 python manage.py runserver
+```
 
+🌐 Backend URL: **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
 
-# 8. Access the Application
-# Open your browser and go to:
-# http://127.0.0.1:8000
+---
 
+### 🔸 Frontend Setup (React)
+
+#### 8️⃣ Navigate to React Frontend
+
+```bash
+cd job-tracker-frontend
+```
+
+---
+
+#### 9️⃣ Install Frontend Dependencies
+
+```bash
+npm install
+```
+
+---
+
+#### 🔟 Start React Development Server
+
+```bash
+npm start
+```
+
+🌐 Frontend URL: **[http://localhost:3000/](http://localhost:3000/)**
+
+---
+
+## ✅ Features
+
+* User Authentication
+* Job Application Tracking
+* Application Status Management
+* Admin Dashboard
+* Django REST + React Integration
+* Responsive UI
+
+---
+
+## 🛠️ Tech Stack
+
+* **Backend:** Django, Django REST Framework
+* **Frontend:** React, npm
+* **Database:** SQLite / PostgreSQL
+* **Version Control:** Git & GitHub
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create a new branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+---
+
+⭐ If you like this project, don’t forget to give it a star on GitHub!
