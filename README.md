@@ -34,19 +34,15 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ### 📋 Job Listings
 
 ```md
-![Jobs](CodeSnaps/jobs.png)
+![Jobs](CodeSnaps/kanban.png)
 ```
 
 ➡️ **More screenshots (12+)** are available inside:
-
-```
-CodeSnaps/
 ```
 
-You can include any image in README like this:
 
 ```md
-![Screenshot](CodeSnaps/image-name.png)
+![Screenshot](CodeSnaps/register.png)
 ```
 
 ---
