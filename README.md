@@ -8,10 +8,10 @@ A full-stack **Job Tracker System** built with **Django (Backend)** and **React 
 
 Before starting, ensure you have the following installed:
 
-* Python **3.10+**
-* Node.js **18+** and npm
-* Git
-* Virtual environment support
+- Python **3.10+**
+- Node.js **18+** and npm
+- Git
+- Virtual environment support
 
 ---
 
@@ -19,39 +19,45 @@ Before starting, ensure you have the following installed:
 
 All screenshots are stored in the **`CodeSnaps/`** folder.
 
+---
+
 ### 📊 Dashboard
 
-```md
-[!Dashboard](CodeSnaps/dashboard.png)[!Dashboard](CodeSnaps/dashboard2)[!Dashboard](CodeSnaps/dashboard3.png)[!Dashboard](CodeSnaps/dashboard4.png)
-```
+![Dashboard](CodeSnaps/dashboard.png)
+![Dashboard](CodeSnaps/dashboard2.png)
+![Dashboard](CodeSnaps/dashboard3.png)
+![Dashboard](CodeSnaps/dashboard4.png)
+
+---
 
 ### 🔐 Login Page
 
-```md
-[!Login](CodeSnaps/login.png)[!Login](CodeSnaps/login2.png)[!Login](CodeSnaps/login3.png)
+![Login](CodeSnaps/login.png)
+![Login](CodeSnaps/login2.png)
+![Login](CodeSnaps/login3.png)
 
+---
 
-```
+### 📋 Job Listings / Kanban View
 
-### 📋 Job Listings
+![Jobs](CodeSnaps/kanban.png)
 
-```md
-[!Jobs](CodeSnaps/kanban.png)
-```
+---
 
-➡️ **More 
+### 📌 More Screens
 
-```md
+![Register](CodeSnaps/register.png)
 
-[!More](CodeSnaps/register.png)
-[!More](CodeSnaps/profile.png)[!More](CodeSnaps/profile2.png)[!More](CodeSnaps/profile3.png)
-[!More](CodeSnaps/profile.png)
-[!More](CodeSnaps/changepassword.png)
-[!More](CodeSnaps/verifyotp.png)
-[!More](CodeSnaps/sendotp.png)
-[!More](CodeSnaps/setnewpassword.png)
+![Profile](CodeSnaps/profile.png)
+![Profile](CodeSnaps/profile2.png)
+![Profile](CodeSnaps/profile3.png)
 
-```
+![Change Password](CodeSnaps/changepassword.png)
+![Verify OTP](CodeSnaps/verifyotp.png)
+![Send OTP](CodeSnaps/sendotp.png)
+![Set New Password](CodeSnaps/setnewpassword.png)
+
+---
 
 ## 🔹 Installation Guide
 
@@ -62,6 +68,7 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ```bash
 git clone https://github.com/sameer9860/Job-Tracker.git
 cd Job-Tracker
+
 ```
 
 ---
