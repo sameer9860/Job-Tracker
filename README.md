@@ -22,19 +22,19 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ### 📊 Dashboard
 
 ```md
-![Dashboard](CodeSnaps/dashboard.png)
+[!Dashboard](CodeSnaps/dashboard.png)
 ```
 
 ### 🔐 Login Page
 
 ```md
-![Login](CodeSnaps/login.png)
+[!Login](CodeSnaps/login.png)
 ```
 
 ### 📋 Job Listings
 
 ```md
-![Jobs](CodeSnaps/kanban.png)
+[!Jobs](CodeSnaps/kanban.png)
 ```
 
 ➡️ **More 
@@ -42,7 +42,8 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 
 
 ```md
-![Screenshot](CodeSnaps/register.png)
+[!More](CodeSnaps/profile.png)
+[!More](CodeSnaps/profile2.png)
 ```
 
 ---
