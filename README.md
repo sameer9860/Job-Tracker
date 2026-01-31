@@ -37,7 +37,7 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ![Jobs](CodeSnaps/kanban.png)
 ```
 
-➡️ **More screenshots (12+)** are available inside:
+➡️ **More 
 ```
 
 
