@@ -40,10 +40,9 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ```
 
 ➡️ **More 
-```
 
+```md
 
-```
 [!More](CodeSnaps/register.png)
 [!More](CodeSnaps/profile.png)[!More](CodeSnaps/profile2.png)[!More](CodeSnaps/profile3.png)
 [!More](CodeSnaps/profile.png)
@@ -53,8 +52,6 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 [!More](CodeSnaps/setnewpassword.png)
 
 ```
-
----
 
 ## 🔹 Installation Guide
 
