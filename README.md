@@ -4,6 +4,18 @@ A full-stack **Job Tracker System** built with **Django (Backend)** and **React 
 
 ---
 
+## 📁 Project Structure
+
+This project is organized as a monorepo split into backend and frontend services:
+
+```text
+Job-Tracker/
+├── backend/        # Django REST Framework Backend
+└── frontend/       # React Frontend
+```
+
+---
+
 ## 📌 Prerequisites
 
 Before starting, ensure you have the following installed:
@@ -17,45 +29,45 @@ Before starting, ensure you have the following installed:
 
 ## 🖼️ Application Screenshots
 
-All screenshots are stored in the **`CodeSnaps/`** folder.
+All screenshots are stored in the **`backend/CodeSnaps/`** folder.
 
 ---
 
 ### 📊 Dashboard
 
-![Dashboard](CodeSnaps/dashboard.png)
-![Dashboard](CodeSnaps/dashboard2.png)
-![Dashboard](CodeSnaps/dashboard3.png)
-![Dashboard](CodeSnaps/dashboard4.png)
+![Dashboard](backend/CodeSnaps/dashboard.png)
+![Dashboard](backend/CodeSnaps/dashboard2.png)
+![Dashboard](backend/CodeSnaps/dashboard3.png)
+![Dashboard](backend/CodeSnaps/dashboard4.png)
 
 ---
 
 ### 🔐 Login Page
 
-![Login](CodeSnaps/login.png)
-![Login](CodeSnaps/login2.png)
-![Login](CodeSnaps/login3.png)
+![Login](backend/CodeSnaps/login.png)
+![Login](backend/CodeSnaps/login2.png)
+![Login](backend/CodeSnaps/login3.png)
 
 ---
 
 ### 📋 Job Listings / Kanban View
 
-![Jobs](CodeSnaps/kanban.png)
+![Jobs](backend/CodeSnaps/kanban.png)
 
 ---
 
 ### 📌 More Screens
 
-![Register](CodeSnaps/register.png)
+![Register](backend/CodeSnaps/register.png)
 
-![Profile](CodeSnaps/profile.png)
-![Profile](CodeSnaps/profile2.png)
-![Profile](CodeSnaps/profile3.png)
+![Profile](backend/CodeSnaps/profile.png)
+![Profile](backend/CodeSnaps/profile2.png)
+![Profile](backend/CodeSnaps/profile3.png)
 
-![Change Password](CodeSnaps/changepassword.png)
-![Verify OTP](CodeSnaps/verifyotp.png)
-![Send OTP](CodeSnaps/sendotp.png)
-![Set New Password](CodeSnaps/setnewpassword.png)
+![Change Password](backend/CodeSnaps/changepassword.png)
+![Verify OTP](backend/CodeSnaps/verifyotp.png)
+![Send OTP](backend/CodeSnaps/sendotp.png)
+![Set New Password](backend/CodeSnaps/setnewpassword.png)
 
 ---
 
@@ -68,7 +80,6 @@ All screenshots are stored in the **`CodeSnaps/`** folder.
 ```bash
 git clone https://github.com/sameer9860/Job-Tracker.git
 cd Job-Tracker
-
 ```
 
 ---
@@ -76,7 +87,8 @@ cd Job-Tracker
 #### 2️⃣ Create Virtual Environment
 
 ```bash
-python -m venv env
+cd backend
+python -m venv job_env
 ```
 
 ---
@@ -86,24 +98,34 @@ python -m venv env
 **Windows (PowerShell)**
 
 ```powershell
-.\env\Scripts\activate
+.\job_env\Scripts\activate
 ```
 
 **Windows (CMD)**
 
 ```cmd
-env\Scripts\activate
+job_env\Scripts\activate
 ```
 
 **macOS / Linux**
 
 ```bash
-source env/bin/activate
+source job_env/bin/activate
 ```
 
 ---
 
-#### 4️⃣ Install Backend Dependencies
+#### 4️⃣ Configure Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `backend/.env` and set your `SECRET_KEY` and other values as needed.
+
+---
+
+#### 5️⃣ Install Backend Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -111,7 +133,7 @@ pip install -r requirements.txt
 
 ---
 
-#### 5️⃣ Apply Database Migrations
+#### 6️⃣ Apply Database Migrations
 
 ```bash
 python manage.py migrate
@@ -119,7 +141,7 @@ python manage.py migrate
 
 ---
 
-#### 6️⃣ Create Superuser (Admin)
+#### 7️⃣ Create Superuser (Admin)
 
 ```bash
 python manage.py createsuperuser
@@ -129,7 +151,7 @@ python manage.py createsuperuser
 
 ---
 
-#### 7️⃣ Run Django Development Server
+#### 8️⃣ Run Django Development Server
 
 ```bash
 python manage.py runserver
@@ -141,15 +163,17 @@ python manage.py runserver
 
 ### 🔸 Frontend Setup (React)
 
-#### 8️⃣ Navigate to React Frontend
+#### 9️⃣ Navigate to React Frontend
+
+Assuming you are in the `backend` directory, navigate back and enter the `frontend` folder:
 
 ```bash
-cd job-tracker-frontend
+cd ../frontend
 ```
 
 ---
 
-#### 9️⃣ Install Frontend Dependencies
+#### 🔟 Install Frontend Dependencies
 
 ```bash
 npm install
@@ -157,7 +181,7 @@ npm install
 
 ---
 
-#### 🔟 Start React Development Server
+#### 1️⃣1️⃣ Start React Development Server
 
 ```bash
 npm start
@@ -169,19 +193,19 @@ npm start
 
 ## ✅ Features
 
-* User Authentication
-* Job Application Tracking
-* Application Status Management
-* Admin Dashboard
-* Django REST + React Integration
-* Responsive UI
+* User Authentication & Authorization (JWT based)
+* Job Application Tracking (Add, Edit, Delete Jobs)
+* Kanban Board / Status Pipeline Management
+* Dashboard with statistics, charts, and reminders
+* Profile Management and Password Reset with OTP
+* Responsive UI with light/dark theme support
 
 ---
 
 ## 🛠️ Tech Stack
 
-* **Backend:** Django, Django REST Framework
-* **Frontend:** React, npm
+* **Backend:** Django, Django REST Framework, SimpleJWT
+* **Frontend:** React, TailwindCSS / Vanilla CSS, ChartJS / Recharts
 * **Database:** SQLite / PostgreSQL
 * **Version Control:** Git & GitHub
 

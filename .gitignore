@@ -1,4 +1,6 @@
-
-.env
+backend/.env
 __pycache__/
-refreshtoken.txt
+backend/refreshtoken.txt
+backend/job_env/
+frontend/node_modules/
+frontend/build/
